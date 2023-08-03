@@ -1,6 +1,8 @@
 # Golang Tools - Container Stress Test and Scanning
 [![License](https://img.shields.io/badge/License-Apache-blue.svg)](LICENSE)
 [![language](https://img.shields.io/badge/Language-Golang-green.svg)](language)
+[![kubernetes](https://img.shields.io/badge/platform-kubernetes-orange.svg)](kubernetes)
+[![runtime](https://img.shields.io/badge/runtime-docker-blue.svg)](docker)
 ----
 ## Project Overview
 
