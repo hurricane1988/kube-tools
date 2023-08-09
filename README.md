@@ -20,7 +20,20 @@ This tool is used to scan the open ports inside a container to ensure the contai
 #### Usage
 
 ```bash
-container-port-scanner <container_id>
+kube-tools scan -H baidu.com -T tcp -P 80,443
+```
+### 2. simulate memory usage.
+This tool is used to simulate memory usage to test the container's memory resource utilization.
+
+#### Usage
+
+```bash
+kube-tools memory -P 8888 -S 10240
+```
+
+### 3. simulate CPU usage.
+```shell
+kube-tools memory -P 8888 -S 10240
 ```
 
 ## Contribution
