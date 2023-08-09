@@ -35,7 +35,7 @@ func ExecutePortScan() *cobra.Command {
 		Use:   "scan",
 		Short: "scan ports",
 		Long:  "scan ports",
-		Run:   runnerScan,
+		Run:   runner,
 	}
 	// 初始化命令
 	portsScan.Flags().StringP("host", "H", "localhost", "host to scan")
@@ -45,7 +45,7 @@ func ExecutePortScan() *cobra.Command {
 }
 
 // runner 扫描端口
-func runnerScan(cmd *cobra.Command, args []string) {
+func runner(cmd *cobra.Command, args []string) {
 	host, _ := cmd.Flags().GetString("host")
 	protocol, _ := cmd.Flags().GetString("protocol")
 	portsStr, _ := cmd.Flags().GetString("ports")

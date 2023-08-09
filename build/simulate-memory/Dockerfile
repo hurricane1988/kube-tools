@@ -13,7 +13,7 @@ WORKDIR /build
 RUN go env -w GOPROXY=https://goproxy.cn,direct
 RUN go env -w GO111MODULE=on
 # 设置编译环境
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOARM=6 go build -installsuffix cgo -o simulate-memory
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOARM=6 go build -installsuffix cgo -o simulate_memory
 # 运行阶段
 FROM alpine:3.18.2
 # 设置容器的健康检查

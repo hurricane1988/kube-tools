@@ -23,6 +23,7 @@ import (
 	"os"
 
 	"kube-tools/pkg/scan_port"
+	"kube-tools/pkg/simulate_memory"
 )
 
 // 定义根命令
@@ -40,6 +41,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	// 注册子端口扫描子命令到root根命令
 	rootCmd.AddCommand(scan_port.ExecutePortScan())
+	rootCmd.AddCommand(simulate_memory.ExecuteSimulateRaw())
 	if err := rootCmd.Execute(); err != nil {
 		logger.Error(err)
 		os.Exit(1)
