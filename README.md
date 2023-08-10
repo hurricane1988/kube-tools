@@ -39,7 +39,10 @@ kube-tools memory -P 8888 -S 10240
 ```shell
 kube-tools metric -P 8080
 ```
-
+### 5. traceroute
+```shell
+kube-tools traceroute --host localhost
+```
 ## Contribution
 If you find any issues or have any improvement suggestions, feel free to raise an issue or submit a pull request. We welcome your contributions!
 
