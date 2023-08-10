@@ -22,8 +22,10 @@ import (
 	"github.com/wonderivan/logger"
 	"os"
 
+	"kube-tools/pkg/metric"
 	"kube-tools/pkg/scan_port"
 	"kube-tools/pkg/simulate_memory"
+	"kube-tools/pkg/traceroute"
 )
 
 // 定义根命令
@@ -42,6 +44,8 @@ func Execute() {
 	// 注册子端口扫描子命令到root根命令
 	rootCmd.AddCommand(scan_port.ExecutePortScan())
 	rootCmd.AddCommand(simulate_memory.ExecuteSimulateRaw())
+	rootCmd.AddCommand(metric.ExecuteMetric())
+	rootCmd.AddCommand(traceroute.ExecuteTraceroute())
 	if err := rootCmd.Execute(); err != nil {
 		logger.Error(err)
 		os.Exit(1)
