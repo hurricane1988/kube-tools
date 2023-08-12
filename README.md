@@ -1,4 +1,4 @@
-# Golang Tools - Container Stress Test and Scanning
+# kube-tools - Container Stress Test and Scanning
 [![License](https://img.shields.io/badge/License-Apache-red?logo=apache)](LICENSE)
 [![language](https://img.shields.io/badge/Language-go-blue?logo=go)](language)
 [![kubernetes](https://img.shields.io/badge/Platform-kubernetes-blue?logo=kubernetes)](kubernetes)
@@ -22,27 +22,33 @@ This tool is used to scan the open ports inside a container to ensure the contai
 ```bash
 kube-tools scan -H baidu.com -T tcp -P 80,443
 ```
+- -H, --host string       host to scan (default "localhost")
+- -P, --ports string      ports to scan (default "22")
+- -T, --protocol string   protocol to scan (default "tcp")
 ### 2. simulate memory usage.
 This tool is used to simulate memory usage to test the container's memory resource utilization.
-
-#### Usage
 
 ```bash
 kube-tools memory -P 8888 -S 10240
 ```
-
-### 3. simulate CPU usage.
-```shell
-kube-tools memory -P 8888 -S 10240
-```
-### 4. metrics
+- -P, --port string   Port to listen on (default "8080")
+- -S, --size int      Memory size in MB
+### 3. metrics
 ```shell
 kube-tools metric -P 8080
 ```
-### 5. traceroute
+- -P, --port string   ports to scan (default "8080")
+### 4. traceroute
 ```shell
 kube-tools traceroute --host localhost
 ```
+- -H, --host string   host to scan (default "localhost")
+### 5. cpu simulate cpu load
+```shell
+kube-tools cpu --cores 5 --minutes 1
+```
+- -C, --cores int     the number of cores to use. (default 1)
+- -M, --minutes int   the minute time to run the simulation. (default 1)
 ## Contribution
 If you find any issues or have any improvement suggestions, feel free to raise an issue or submit a pull request. We welcome your contributions!
 
