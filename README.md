@@ -27,23 +27,26 @@ kube-tools scan -H baidu.com -T tcp -P 80,443
 - -T, --protocol string   protocol to scan (default "tcp")
 ### 2. simulate memory usage.
 This tool is used to simulate memory usage to test the container's memory resource utilization.
-
+#### Usage
 ```bash
 kube-tools memory -P 8888 -S 10240
 ```
 - -P, --port string   Port to listen on (default "8080")
 - -S, --size int      Memory size in MB
 ### 3. metrics
+#### Usage
 ```shell
 kube-tools metric -P 8080
 ```
 - -P, --port string   ports to scan (default "8080")
 ### 4. traceroute
+#### Usage
 ```shell
 kube-tools traceroute --host localhost
 ```
 - -H, --host string   host to scan (default "localhost")
 ### 5. cpu simulate cpu load
+#### Usage
 ```shell
 kube-tools cpu --cores 5 --minutes 1
 ```
