@@ -13,16 +13,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: build-simulate-memory-binary
+.PHONY: build-binary build-image clean-binary clean-image save-image go-vet
 
-all: build-simulate-memory-binary
+all: build-binary build-image clean-binary clean-image save-image go-vet
 
-build-simulate-memory-binary: ;$(info $(M)...Begin to build simulate-memory binary.)  @ ## Generate https certificate
-	hack/memory/build_binary.sh
+build-binary: ;$(info $(M)...Begin to build binary.)  @ ## build binary
+	hack/build_binary.sh
 
+build-image: ;$(info $(M)...Begin to build image.)  @ ## build image
+	hack/build_image.sh
 
+clean-binary: ;$(info $(M)...Begin to clean binary.)  @ ## clean binary
+	hack/clean_binary.sh
+
+clean-image: ;$(info $(M)...Begin to clean image.)  @ ## clean image
+	hack/clean_image.sh
+
+save-image: ;$(info $(M)...Begin to save image.)  @ ## save image
+	hack/save_image.sh
+
+go-vet: ;$(info $(M)...Begin to go vet.)  @ ## go vet
+	hack/go_vet.sh
 
 help:
-	@echo "-----------------------------------------------------------------------------------"
-	@echo "make build-simulate-memory-binary                - build the simulate-memory binary"
-	@echo "-----------------------------------------------------------------------------------"
+	@echo "\033[1;33m------------------------------------------------------\033[0m"
+	@echo "\033[1;33m          [Kube-Tools Makefile Commands]          \033[0m"
+	@echo "\033[1;36mbuild-binary\033[0m           - \033[1;32mbuild the kube-tools binary\033[0m"
+	@echo "\033[1;36mbuild-image\033[0m            - \033[1;32mbuild the kube-tools image\033[0m"
+	@echo "\033[1;31mclean-binary\033[0m           - \033[1;91mclean the kube-tools binary\033[0m"
+	@echo "\033[1;31mclean-image\033[0m            - \033[1;91mclean the kube-tools image\033[0m"
+	@echo "\033[1;33msave-image\033[0m             - \033[1;32msave the kube-tools image\033[0m"
+	@echo "\033[1;33mgo-vet\033[0m                 - \033[1;32mexecute go vet test.\033[0m"
+	@echo "\033[1;33m------------------------------------------------------\033[0m"

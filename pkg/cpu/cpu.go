@@ -75,5 +75,4 @@ func cpuSimulateLoad(coreID int, done chan<- bool) {
 		// 模式CPU负载
 		_ = 2 + 2
 	}
-	done <- true
 }
