@@ -23,6 +23,7 @@ import (
 	"os"
 
 	"kube-tools/pkg/cpu"
+	"kube-tools/pkg/jwt"
 	"kube-tools/pkg/memory"
 	"kube-tools/pkg/metric"
 	"kube-tools/pkg/ports"
@@ -48,6 +49,7 @@ func Execute() {
 	rootCmd.AddCommand(metric.ExecuteMetric())
 	rootCmd.AddCommand(traceroute.ExecuteTraceroute())
 	rootCmd.AddCommand(cpu.ExecuteCPUSimulateLoad())
+	rootCmd.AddCommand(jwt.ExecuteJwtToken())
 	if err := rootCmd.Execute(); err != nil {
 		logger.Error(err)
 		os.Exit(1)
