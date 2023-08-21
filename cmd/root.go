@@ -23,10 +23,12 @@ import (
 	"os"
 
 	"kube-tools/pkg/cpu"
+	"kube-tools/pkg/iptables"
 	"kube-tools/pkg/jwt"
 	"kube-tools/pkg/memory"
 	"kube-tools/pkg/metric"
 	"kube-tools/pkg/ports"
+	"kube-tools/pkg/stats"
 	"kube-tools/pkg/traceroute"
 )
 
@@ -50,6 +52,8 @@ func Execute() {
 	rootCmd.AddCommand(traceroute.ExecuteTraceroute())
 	rootCmd.AddCommand(cpu.ExecuteCPUSimulateLoad())
 	rootCmd.AddCommand(jwt.ExecuteJwtToken())
+	rootCmd.AddCommand(iptables.ExecuteIptables())
+	rootCmd.AddCommand(stats.ExecuteStatsGroup())
 	if err := rootCmd.Execute(); err != nil {
 		logger.Error(err)
 		os.Exit(1)
