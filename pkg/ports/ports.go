@@ -38,9 +38,9 @@ func ExecutePortScan() *cobra.Command {
 		Run:   runner,
 	}
 	// 初始化命令
-	portsScan.Flags().StringP("host", "H", "localhost", "host to scan")
-	portsScan.Flags().StringP("protocol", "T", "tcp", "protocol to scan")
-	portsScan.Flags().StringP("ports", "P", "22", "ports to scan")
+	portsScan.Flags().StringP("host", "i", "localhost", "host to scan")
+	portsScan.Flags().StringP("protocol", "t", "tcp", "protocol to scan")
+	portsScan.Flags().StringP("ports", "p", "22", "ports to scan")
 	return portsScan
 }
 

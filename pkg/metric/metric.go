@@ -54,7 +54,7 @@ func ExecuteMetric() *cobra.Command {
 		Run:   startServer,
 	}
 	// 初始化命令
-	metric.Flags().StringP("port", "P", "8080", "ports to scan")
+	metric.Flags().StringP("port", "p", "8080", "ports to scan")
 	return metric
 }
 

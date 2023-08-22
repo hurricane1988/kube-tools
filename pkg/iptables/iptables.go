@@ -51,7 +51,6 @@ func runner(cmd *cobra.Command, args []string) {
 	}
 	logger.Info("iptables rules:", rules)
 
-	fmt.Println("Iptables rules:")
 	for _, rule := range rules {
 		fmt.Println(rule)
 	}

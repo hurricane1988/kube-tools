@@ -17,7 +17,9 @@ limitations under the License.
 package net
 
 import (
+	netv3 "github.com/shirou/gopsutil/v3/net"
 	"github.com/spf13/cobra"
+	"github.com/wonderivan/logger"
 )
 
 // 定义字典常量
@@ -40,6 +42,9 @@ var connectsStatus = []string{
 	"CLOSING",
 	"LAST_ACK",
 }
+
+// GlobalConnObjects 定义全局链接对象
+var GlobalConnObjects []netv3.ConnectionStat
 
 // 定义scoket套接字类型常量
 var socketType = map[uint32]string{
@@ -73,4 +78,15 @@ func ExecuteStatsNet() *cobra.Command {
 	statNet.AddCommand(executeNetInterfaceGroup())
 	statNet.AddCommand(executeConnectGroup())
 	return statNet
+}
+
+// 初始化链接对象
+func init() {
+	// 获取网络连接信息
+	conns, err := netv3.Connections("all")
+	if err != nil {
+		logger.Error("Error:", err)
+		return
+	}
+	GlobalConnObjects = conns
 }

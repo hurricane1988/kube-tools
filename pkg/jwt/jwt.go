@@ -49,11 +49,11 @@ func ExecuteJwtToken() *cobra.Command {
 		Run:   runner,
 	}
 	// 初始化命令
-	jwt.Flags().StringP("port", "P", "8080", "The http web service listening port.")
-	jwt.Flags().StringP("username", "U", "admin", "The username of the token.")
-	jwt.Flags().StringP("password", "W", "password", "The password of the token.")
-	jwt.Flags().IntP("expire", "E", 7200, "The token expire time,  default 7200s.")
-	jwt.Flags().StringP("issuer", "I", "issuer", "The issuer of the token.")
+	jwt.Flags().StringP("port", "p", "8080", "The http web service listening port.")
+	jwt.Flags().StringP("username", "u", "admin", "The username of the token.")
+	jwt.Flags().StringP("password", "w", "password", "The password of the token.")
+	jwt.Flags().IntP("expire", "e", 7200, "The token expire time,  default 7200s.")
+	jwt.Flags().StringP("issuer", "i", "issuer", "The issuer of the token.")
 	return jwt
 }
 

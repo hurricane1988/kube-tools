@@ -73,8 +73,8 @@ func ExecuteSimulateRaw() *cobra.Command {
 		Run:   runner,
 	}
 	// 初始化命令
-	simulateRaw.Flags().IntP("size", "S", 0, "Memory size in MB")
-	simulateRaw.Flags().StringP("port", "P", "8080", "Port to listen on")
+	simulateRaw.Flags().IntP("size", "s", 0, "Memory size in MB")
+	simulateRaw.Flags().StringP("port", "p", "8080", "Port to listen on")
 	return simulateRaw
 }
 

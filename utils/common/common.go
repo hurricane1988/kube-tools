@@ -48,9 +48,20 @@ func Find(slice []string, val string) bool {
 // Int32ToString 整型数组转字符串
 func Int32ToString(intSlice []int32) string {
 	var strBuilder strings.Builder
-	for _, num := range intSlice {
+	for _, num := range removeDuplicateInts(intSlice) {
 		strBuilder.WriteString(strconv.Itoa(int(num)))
-		strBuilder.WriteString("\n")
 	}
 	return strBuilder.String()
+}
+
+func removeDuplicateInts(intput []int32) []int32 {
+	intMap := make(map[int32]bool)
+	var result []int32
+	for _, num := range intput {
+		if !intMap[num] {
+			intMap[num] = true
+			result = append(result, num)
+		}
+	}
+	return result
 }

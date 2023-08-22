@@ -21,6 +21,8 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	netv3 "github.com/shirou/gopsutil/v3/net"
 	"github.com/spf13/cobra"
+	"math"
+	"net"
 	"os"
 	"sort"
 	"strings"
@@ -31,31 +33,53 @@ import (
 // executeConnectGroup 定义connect命令
 func executeConnectGroup() *cobra.Command {
 	var connCommand = &cobra.Command{
-		Use:   "connect",
+		Use:   "conn",
 		Short: "show the connection of this system.",
 		Long:  "show the connection of this system.",
 		// 定义根命令执行函数
 		Run: connGroup,
 	}
-	connCommand.Flags().StringP("type", "T", "all", "net type, support all,inet,inet4,inet6,tcp,udp,unix")
-	connCommand.Flags().StringP("status", "S", "established", "connect status must be one of: listen,syn_sent,syn_recv,established,fin_wait1,fin_wait2,close_wait,closed,time_wait,last_ack,closing")
+	connCommand.Flags().StringP("type", "t", "", "net type, support all,inet,inet4,inet6,tcp,udp,unix")
+	connCommand.Flags().Uint32P("localPort", "l", 0, "local  port")
+	connCommand.Flags().Uint32P("remotePort", "r", 0, "remote  port")
+	connCommand.Flags().StringP("remoteAddr", "a", "", "remote  address")
+	connCommand.Flags().StringP("status", "s", "", "connect status must be one of: listen,syn_sent,syn_recv,established,fin_wait1,fin_wait2,close_wait,closed,time_wait,last_ack,closing")
 	return connCommand
 }
 
 func connGroup(cmd *cobra.Command, args []string) {
 	netType, _ := cmd.Flags().GetString("type")
 	connStatus, _ := cmd.Flags().GetString("status")
+	localPort, _ := cmd.Flags().GetUint32("localPort")
+	remotePort, _ := cmd.Flags().GetUint32("remotePort")
+	remoteAddr, _ := cmd.Flags().GetString("remoteAddr")
 	// 判断输入的命令是否正常
-	if common.Find(netTypes, netType) != true {
+	if common.Find(netTypes, netType) != true && netType != "" {
 		fmt.Println("net type must be one of: all,inet,inet4,inet6,tcp,udp,unix")
-	} else {
+	} else if common.Find(netTypes, netType) == true && netType != "" {
 		listNetConnects(netType)
 	}
-	if common.Find(connectsStatus, strings.ToUpper(connStatus)) != true {
+	// 链接状态
+	if connStatus != "" && common.Find(connectsStatus, strings.ToUpper(connStatus)) != true {
 		fmt.Println("connect status must be one of: listen,syn_sent,syn_recv,established,fin_wait1,fin_wait2,close_wait,closed,time_wait,last_ack,closing")
-	} else {
+	} else if connStatus != "" && common.Find(connectsStatus, strings.ToUpper(connStatus)) == true {
 		sumRemoteIpMax(connStatus)
 	}
+
+	if remoteAddr != "" && net.ParseIP(remoteAddr) != nil {
+		remoteAddrSum(remoteAddr)
+	} else if remoteAddr != "" && net.ParseIP(remoteAddr) == nil {
+		fmt.Println("remote addr must be valid ip address")
+	}
+	// 本地监听端口统计
+	if localPort != math.MaxUint32 && 1 <= localPort && localPort <= 65535 {
+		localPortSum(localPort)
+	}
+	// 远程监听端口统计
+	if remotePort != math.MaxUint32 && 1 <= remotePort && remotePort <= 65535 {
+		remotePortSum(remotePort)
+	}
+	connectionsSortByRemoteAddr("inet")
 }
 
 func listNetConnects(netType string) []netv3.ConnectionStat {
@@ -89,22 +113,17 @@ func listNetConnects(netType string) []netv3.ConnectionStat {
 			},
 		})
 	}
+	t.SetAutoIndex(true)
 	t.Render()
 	return conns
 }
 
 func sumRemoteIpMax(status string) {
-	// 获取网络连接信息
-	conns, err := netv3.Connections("all")
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
 	// 创建一个映射来存储每个远端IP的连接数量
 	ipCountMap := make(map[string]int)
 
 	// 遍历连接并统计每个远端IP的连接数量
-	for _, conn := range conns {
+	for _, conn := range GlobalConnObjects {
 		if conn.Status == strings.ToUpper(status) && conn.Raddr.IP != "" {
 			ipCountMap[conn.Raddr.IP]++
 		}
@@ -134,6 +153,161 @@ func sumRemoteIpMax(status string) {
 				ip.IP,
 				ip.Count,
 				strings.ToUpper(status),
+			},
+		})
+	}
+	t.SetAutoIndex(true)
+	t.Render()
+}
+
+func localPortSum(localPort uint32) {
+	// 创建一个映射来存储每个本地端口的连接数量
+	portCountMap := make(map[uint32]int)
+
+	// 遍历连接并统计每个本地端口的连接数量
+	for _, conn := range GlobalConnObjects {
+		if conn.Laddr.Port == localPort {
+			portCountMap[conn.Laddr.Port]++
+		}
+	}
+	// 创建一个切片来对连接数量进行排序
+	type PortCount struct {
+		Port  uint32 `json:"port"`
+		Count int    `json:"count"`
+	}
+	var portCounts []PortCount
+	for port, count := range portCountMap {
+		portCounts = append(portCounts, PortCount{Port: port, Count: count})
+	}
+
+	// 按连接数量从高到低对切片进行排序
+	sort.Slice(portCounts, func(i, j int) bool {
+		return portCounts[i].Count > portCounts[j].Count
+	})
+	// 打印连接最多的本地端口
+	t := table.NewWriter()
+	// 设置输出到终端
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"local port", "connect count"})
+	t.AppendSeparator()
+	for _, port := range portCounts {
+		t.AppendRows([]table.Row{
+			{
+				port.Port,
+				port.Count,
+			},
+		})
+	}
+	t.SetAutoIndex(true)
+	t.Render()
+}
+
+func remotePortSum(remotePort uint32) {
+	// 创建一个映射来存储每个本地端口的连接数量
+	portCountMap := make(map[uint32]int)
+
+	// 遍历连接并统计每个本地端口的连接数量
+	for _, conn := range GlobalConnObjects {
+		if conn.Raddr.Port == remotePort {
+			portCountMap[conn.Raddr.Port]++
+		}
+	}
+	// 创建一个切片来对连接数量进行排序
+	type PortCount struct {
+		Port  uint32 `json:"port"`
+		Count int    `json:"count"`
+	}
+	var portCounts []PortCount
+	for port, count := range portCountMap {
+		portCounts = append(portCounts, PortCount{Port: port, Count: count})
+	}
+
+	// 按连接数量从高到低对切片进行排序
+	sort.Slice(portCounts, func(i, j int) bool {
+		return portCounts[i].Count > portCounts[j].Count
+	})
+	// 打印连接最多的本地端口
+	t := table.NewWriter()
+	// 设置输出到终端
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"remote port", "connect count"})
+	t.AppendSeparator()
+	for _, port := range portCounts {
+		t.AppendRows([]table.Row{
+			{
+				port.Port,
+				port.Count,
+			},
+		})
+	}
+	t.SetAutoIndex(true)
+	t.Render()
+}
+
+func remoteAddrSum(remoteAddr string) {
+	// 创建一个映射来存储每个本地端口的连接数量
+	addrCountMap := make(map[string]int)
+
+	// 遍历连接并统计每个本地端口的连接数量
+	for _, conn := range GlobalConnObjects {
+		if conn.Raddr.IP == remoteAddr {
+			addrCountMap[conn.Raddr.IP]++
+		}
+	}
+	// 创建一个切片来对连接数量进行排序
+	type AddrCount struct {
+		Addr  string `json:"addr"`
+		Count int    `json:"count"`
+	}
+	var addrCounts []AddrCount
+	for addr, count := range addrCountMap {
+		addrCounts = append(addrCounts, AddrCount{Addr: addr, Count: count})
+	}
+
+	// 按连接数量从高到低对切片进行排序
+	sort.Slice(addrCounts, func(i, j int) bool {
+		return addrCounts[i].Count > addrCounts[j].Count
+	})
+	t := table.NewWriter()
+	// 设置输出到终端
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"remote address", "connect count"})
+	t.AppendSeparator()
+	for _, addr := range addrCounts {
+		t.AppendRows([]table.Row{
+			{
+				addr.Addr,
+				addr.Count,
+			},
+		})
+	}
+	t.SetAutoIndex(true)
+	t.Render()
+}
+
+func connectionsSortByRemoteAddr(connType string) {
+	// 定义基于远程连接的map
+	remoteConnMap := make(map[string]int32)
+	for _, conn := range GlobalConnObjects {
+		if common.Find(connectsStatus, conn.Status) == true {
+			remoteIP := conn.Raddr.IP
+			remoteConnMap[remoteIP]++
+		}
+	}
+	remoteConnections := make([]RemoteConnection, 0, len(remoteConnMap))
+	for remoteIP, connections := range remoteConnMap {
+		remoteConnections = append(remoteConnections, RemoteConnection{RemoteIP: remoteIP, Connections: connections})
+	}
+	sort.Sort(ConnectionSummary(remoteConnections))
+	t := table.NewWriter()
+	// 设置输出到终端
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"remote address", "connect count"})
+	for _, addr := range remoteConnections {
+		t.AppendRows([]table.Row{
+			{
+				addr.RemoteIP,
+				addr.Connections,
 			},
 		})
 	}

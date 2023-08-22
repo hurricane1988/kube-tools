@@ -34,8 +34,8 @@ func ExecuteCPUSimulateLoad() *cobra.Command {
 		Run:   runner,
 	}
 	// 初始化命令
-	cpu.Flags().IntP("cores", "C", 1, "the number of cores to use.")
-	cpu.Flags().IntP("minutes", "M", 1, "the minute time to run the simulation.")
+	cpu.Flags().IntP("cores", "c", 1, "the number of cores to use.")
+	cpu.Flags().IntP("minutes", "m", 1, "the minute time to run the simulation.")
 	return cpu
 }
 

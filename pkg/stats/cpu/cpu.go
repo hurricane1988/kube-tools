@@ -32,7 +32,7 @@ func ExecuteStatsCpu() *cobra.Command {
 		Long:  "stats cpu information",
 		Run:   runner,
 	}
-	statCpu.Flags().StringP("choice", "C", "sum", "stats cpu information")
+	statCpu.Flags().StringP("choice", "c", "sum", "support choices are sum,detail")
 	return statCpu
 }
 
