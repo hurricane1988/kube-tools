@@ -42,6 +42,7 @@ func executeConnectGroup() *cobra.Command {
 	connCommand.Flags().StringP("type", "t", "", "net type, support all,inet,inet4,inet6,tcp,udp,unix")
 	connCommand.Flags().Uint32P("localPort", "l", 0, "local  port")
 	connCommand.Flags().Uint32P("remotePort", "r", 0, "remote  port")
+	connCommand.Flags().BoolP("summary", "m", false, "connections summary order by remote ip address. Support value: true,false")
 	connCommand.Flags().StringP("remoteAddr", "a", "", "remote  address")
 	connCommand.Flags().StringP("status", "s", "", "connect status must be one of: listen,syn_sent,syn_recv,established,fin_wait1,fin_wait2,close_wait,closed,time_wait,last_ack,closing")
 	return connCommand
@@ -53,6 +54,7 @@ func connGroup(cmd *cobra.Command, args []string) {
 	localPort, _ := cmd.Flags().GetUint32("localPort")
 	remotePort, _ := cmd.Flags().GetUint32("remotePort")
 	remoteAddr, _ := cmd.Flags().GetString("remoteAddr")
+	summary, _ := cmd.Flags().GetBool("summary")
 	// 判断输入的命令是否正常
 	if common.Find(netTypes, netType) != true && netType != "" {
 		fmt.Println("net type must be one of: all,inet,inet4,inet6,tcp,udp,unix")
@@ -66,6 +68,9 @@ func connGroup(cmd *cobra.Command, args []string) {
 		sumRemoteIpMax(connStatus)
 	}
 
+	if summary == true {
+		connectionsSortByRemoteAddr("inet")
+	}
 	if remoteAddr != "" && net.ParseIP(remoteAddr) != nil {
 		remoteAddrSum(remoteAddr)
 	} else if remoteAddr != "" && net.ParseIP(remoteAddr) == nil {
@@ -79,7 +84,6 @@ func connGroup(cmd *cobra.Command, args []string) {
 	if remotePort != math.MaxUint32 && 1 <= remotePort && remotePort <= 65535 {
 		remotePortSum(remotePort)
 	}
-	connectionsSortByRemoteAddr("inet")
 }
 
 func listNetConnects(netType string) []netv3.ConnectionStat {
