@@ -17,9 +17,12 @@ limitations under the License.
 package common
 
 import (
+	"fmt"
 	netv3 "github.com/shirou/gopsutil/v3/net"
+	"math"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // FormatAddr IP地址处理
@@ -64,4 +67,34 @@ func removeDuplicateInts(intput []int32) []int32 {
 		}
 	}
 	return result
+}
+
+func RemoveDuplicateStrings(intput []string) []string {
+	strMap := make(map[string]bool)
+	var result []string
+	for _, item := range intput {
+		if !strMap[item] {
+			strMap[item] = true
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func FormattedTime(int64Timestamp int64) string {
+	nanosecondTimestamp := int64Timestamp * int64(time.Millisecond)
+	return time.Unix(0, nanosecondTimestamp).Format("2006-01-02 15:04:05")
+}
+
+func ByteToMB(bytes int) float64 {
+	mb := float64(bytes / 1024 / 1024)
+	return math.Round(mb*100) / 100
+}
+
+func StringToInt32(str string) int32 {
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return int32(num)
 }

@@ -42,6 +42,7 @@ func executeConnectGroup() *cobra.Command {
 	connCommand.Flags().StringP("type", "t", "", "net type, support all,inet,inet4,inet6,tcp,udp,unix")
 	connCommand.Flags().Uint32P("localPort", "l", 0, "local  port")
 	connCommand.Flags().Uint32P("remotePort", "r", 0, "remote  port")
+	connCommand.Flags().StringP("pid", "p", "", "process id")
 	connCommand.Flags().BoolP("summary", "m", false, "connections summary order by remote ip address. Support value: true,false")
 	connCommand.Flags().StringP("remoteAddr", "a", "", "remote  address")
 	connCommand.Flags().StringP("status", "s", "", "connect status must be one of: listen,syn_sent,syn_recv,established,fin_wait1,fin_wait2,close_wait,closed,time_wait,last_ack,closing")
@@ -54,6 +55,7 @@ func connGroup(cmd *cobra.Command, args []string) {
 	localPort, _ := cmd.Flags().GetUint32("localPort")
 	remotePort, _ := cmd.Flags().GetUint32("remotePort")
 	remoteAddr, _ := cmd.Flags().GetString("remoteAddr")
+	pid, _ := cmd.Flags().GetString("pid")
 	summary, _ := cmd.Flags().GetBool("summary")
 	// 判断输入的命令是否正常
 	if common.Find(netTypes, netType) != true && netType != "" {
@@ -83,6 +85,10 @@ func connGroup(cmd *cobra.Command, args []string) {
 	// 远程监听端口统计
 	if remotePort != math.MaxUint32 && 1 <= remotePort && remotePort <= 65535 {
 		remotePortSum(remotePort)
+	}
+	// 基于pid进程号列出链接信息
+	if pid != "" {
+		listNetConnectsByPID(common.StringToInt32(pid))
 	}
 }
 
@@ -307,11 +313,47 @@ func connectionsSortByRemoteAddr(connType string) {
 	// 设置输出到终端
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"remote address", "connect count"})
+	t.AppendSeparator()
 	for _, addr := range remoteConnections {
 		t.AppendRows([]table.Row{
 			{
 				addr.RemoteIP,
 				addr.Connections,
+			},
+		})
+	}
+	t.SetAutoIndex(true)
+	t.Render()
+}
+
+func listNetConnectsByPID(pid int32) {
+	// 创建一个映射来存储每个本地端口的连接数量
+	var pidConns []netv3.ConnectionStat
+	for _, conn := range GlobalConnObjects {
+		if conn.Pid == pid {
+			pidConns = append(pidConns, conn)
+		}
+	}
+	// 初始化table对象
+	t := table.NewWriter()
+	// 设置输出到终端
+	t.SetOutputMirror(os.Stdout)
+	// 设置表头header
+	t.AppendHeader(table.Row{"uid", "pid", "file descriptor", "family", "socket type", "local ip", "local port", "remote ip", "remote port", "status"})
+	t.AppendSeparator()
+	for _, c := range pidConns {
+		t.AppendRows([]table.Row{
+			{
+				common.Int32ToString(c.Uids),
+				c.Pid,
+				c.Fd,
+				familyType[c.Family],
+				socketType[c.Type],
+				c.Laddr.IP,
+				c.Laddr.Port,
+				c.Raddr.IP,
+				c.Raddr.Port,
+				c.Status,
 			},
 		})
 	}

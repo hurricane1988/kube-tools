@@ -16,6 +16,32 @@ limitations under the License.
 
 package net
 
+import (
+	netv3 "github.com/shirou/gopsutil/v3/net"
+)
+
+// GlobalConnObjects 定义全局链接对象
+var GlobalConnObjects []netv3.ConnectionStat
+
+// 定义scoket套接字类型常量
+var socketType = map[uint32]string{
+	1: "tcp",
+	2: "udp",
+	3: "icmp",
+	4: "ipv6",
+}
+
+// 定义协议内容切片常量
+var netTypes = []string{
+	"all",
+	"inet",
+	"inet4",
+	"inet6",
+	"tcp",
+	"udp",
+	"unix",
+}
+
 type RemoteConnection struct {
 	RemoteIP    string
 	Connections int32

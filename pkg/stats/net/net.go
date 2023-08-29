@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// TODO: https://godocs.io/github.com/shirou/gopsutil/v3/net
+
 package net
 
 import (
@@ -41,28 +43,6 @@ var connectsStatus = []string{
 	"CLOSE_WAIT",
 	"CLOSING",
 	"LAST_ACK",
-}
-
-// GlobalConnObjects 定义全局链接对象
-var GlobalConnObjects []netv3.ConnectionStat
-
-// 定义scoket套接字类型常量
-var socketType = map[uint32]string{
-	1: "tcp",
-	2: "udp",
-	3: "icmp",
-	4: "ipv6",
-}
-
-// 定义协议内容切片常量
-var netTypes = []string{
-	"all",
-	"inet",
-	"inet4",
-	"inet6",
-	"tcp",
-	"udp",
-	"unix",
 }
 
 // ExecuteStatsNet 定义端口扫描执行器

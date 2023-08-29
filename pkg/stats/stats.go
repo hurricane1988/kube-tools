@@ -21,6 +21,7 @@ import (
 
 	"kube-tools/pkg/stats/cpu"
 	"kube-tools/pkg/stats/net"
+	"kube-tools/pkg/stats/process"
 )
 
 // ExecuteStatsGroup 定义stats命令
@@ -36,5 +37,6 @@ func ExecuteStatsGroup() *cobra.Command {
 	/* 注册stats相关子命令 */
 	statsGroup.AddCommand(cpu.ExecuteStatsCpu())
 	statsGroup.AddCommand(net.ExecuteStatsNet())
+	statsGroup.AddCommand(process.ExecuteStatsProcess())
 	return statsGroup
 }
